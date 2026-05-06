@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings - EduHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="data-manager.js"></script>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <button class="sidebar-toggle" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1>Profile Settings</h1>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <section class="profile-page">
+            <div class="section-content">
+                <div class="profile-header">
+                    <div class="profile-picture-large">
+                        <img id="profileImgLarge" src="https://img.icons8.com/color/96/000000/user-male-circle--v1.png" alt="Profile" onerror="this.src='https://img.icons8.com/color/96/000000/user-male-circle--v1.png'">
+                        <div class="profile-picture-overlay">
+                            <i class="fas fa-camera"></i>
+                            <input type="file" id="profilePictureInput" accept="image/*" onchange="previewProfilePicture()">
+                        </div>
+                    </div>
+                    <div class="profile-info-large">
+                        <h2 id="profileNameDisplay">Guest</h2>
+                        <p id="profileRoleDisplay">STUDENT</p>
+                    </div>
+                </div>
+
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label>Full Name:</label>
+                        <input type="text" id="profileNameInput" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password:</label>
+                        <input type="password" id="profilePasswordInput" placeholder="Leave empty to keep current password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password:</label>
+                        <input type="password" id="profileConfirmPasswordInput" placeholder="Confirm new password">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn" onclick="updateProfile()">Save Changes</button>
+                        <button class="btn-secondary" onclick="goBack()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        // Load current user data
+        let currentUser = JSON.parse(localStorage.getItem('eduUser')) || null;
+
+        function initProfilePage() {
+            if (!currentUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Populate form with current data
+            document.getElementById('profileNameInput').value = currentUser.name || '';
+            document.getElementById('profileNameDisplay').textContent = currentUser.name || 'Guest';
+            document.getElementById('profileRoleDisplay').textContent = currentUser.role?.toUpperCase() || 'STUDENT';
+
+            // Set profile picture
+            if (currentUser.profilePicture) {
+                document.getElementById('profileImgLarge').src = currentUser.profilePicture;
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+
+        function previewProfilePicture() {
+            const file = document.getElementById('profilePictureInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profileImgLarge').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function updateProfile() {
+            if (!currentUser) {
+                showToast('Please login first', 'error');
+                return;
+            }
+
+            const name = document.getElementById('profileNameInput').value.trim();
+            const password = document.getElementById('profilePasswordInput').value;
+            const confirmPassword = document.getElementById('profileConfirmPasswordInput').value;
+            const file = document.getElementById('profilePictureInput').files[0];
+
+            if (!name) {
+                showToast('Name is required', 'error');
+                return;
+            }
+
+            if (password && password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            // Update user object
+            currentUser.name = name;
+            document.getElementById('profileNameDisplay').textContent = name;
+
+            if (password) {
+                // In production, hash and update password
+                currentUser.password = password;
+            }
+
+            // Handle profile picture upload
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentUser.profilePicture = e.target.result;
+                    // In production, upload to Supabase Storage
+                    document.getElementById('profileImgLarge').src = e.target.result;
+                    localStorage.setItem('eduUser', JSON.stringify(currentUser));
+                    showToast('Profile updated successfully!', 'success');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                localStorage.setItem('eduUser', JSON.stringify(currentUser));
+                showToast('Profile updated successfully!', 'success');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', initProfilePage);
+    </script>
+</body>
+</html>

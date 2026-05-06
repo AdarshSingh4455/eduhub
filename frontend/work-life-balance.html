@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Mode - EduHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="data-manager.js"></script>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-book" style="font-size: 1.8em;"></i>
+            <h2>EduHub</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="index.html#studies"><i class="fas fa-book"></i> Studies</a></li>
+            <li><a href="index.html#skills"><i class="fas fa-laptop-code"></i> Skills</a></li>
+            <li><a href="index.html#mental-health" class="active"><i class="fas fa-heart"></i> Mental Health</a></li>
+            <li><a href="index.html#chat"><i class="fas fa-comments"></i> Chat Support</a></li>
+            <li><a href="index.html#about"><i class="fas fa-circle-info"></i> About</a></li>
+            <li><a href="index.html#profile"><i class="fas fa-user"></i> Profile</a></li>
+        </ul>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <button class="sidebar-toggle" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1>Study Mode</h1>
+            <p>Focused study sessions with breaks and progress tracking</p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <section class="study-mode-section">
+            <div class="section-content">
+                <!-- STUDY TIMER -->
+                <div class="timer-container">
+                    <div class="timer-display">
+                        <div class="timer-circle">
+                            <div class="timer-text" id="timerDisplay">25:00</div>
+                            <div class="timer-mode" id="timerMode">Study Time</div>
+                        </div>
+                    </div>
+
+                    <div class="timer-controls">
+                        <button class="timer-btn start-btn" id="startBtn" onclick="startTimer()">
+                            <i class="fas fa-play"></i> Start
+                        </button>
+                        <button class="timer-btn pause-btn" id="pauseBtn" onclick="pauseTimer()" disabled>
+                            <i class="fas fa-pause"></i> Pause
+                        </button>
+                        <button class="timer-btn reset-btn" id="resetBtn" onclick="resetTimer()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+
+                    <div class="timer-settings">
+                        <div class="setting-group">
+                            <label>Study Duration:</label>
+                            <select id="studyDuration" onchange="updateTimerSettings()">
+                                <option value="25">25 minutes</option>
+                                <option value="30">30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">60 minutes</option>
+                            </select>
+                        </div>
+                        <div class="setting-group">
+                            <label>Break Duration:</label>
+                            <select id="breakDuration" onchange="updateTimerSettings()">
+                                <option value="5">5 minutes</option>
+                                <option value="10">10 minutes</option>
+                                <option value="15">15 minutes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STUDY STATS -->
+                <div class="study-stats">
+                    <h3>Today's Progress</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-clock"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="totalStudyTime">0m</span>
+                                <span class="stat-label">Study Time</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="completedSessions">0</span>
+                                <span class="stat-label">Sessions</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-fire"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="currentStreak">0</span>
+                                <span class="stat-label">Day Streak</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-trophy"></i>
+                            <div class="stat-info">
+                                <span class="stat-value" id="weeklyGoal">0/7</span>
+                                <span class="stat-label">Weekly Goal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STUDY NOTES -->
+                <div class="study-notes">
+                    <h3>Session Notes</h3>
+                    <div class="notes-input">
+                        <textarea id="sessionNotes" placeholder="What did you study today? Any challenges or breakthroughs?" rows="4"></textarea>
+                        <button class="btn" onclick="saveSessionNotes()">
+                            <i class="fas fa-save"></i> Save Notes
+                        </button>
+                    </div>
+
+                    <div class="recent-notes" id="recentNotes">
+                        <!-- Recent notes will appear here -->
+                    </div>
+                </div>
+
+                <!-- BREAK REMINDER -->
+                <div class="break-reminder" id="breakReminder" style="display: none;">
+                    <div class="reminder-content">
+                        <i class="fas fa-coffee"></i>
+                        <h4>Break Time!</h4>
+                        <p>Take a moment to stretch, walk around, or grab a drink. You've earned it!</p>
+                        <button class="btn" onclick="dismissBreakReminder()">Got it!</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        // Study Mode Variables
+        let timerInterval = null;
+        let isStudyMode = true;
+        let timeLeft = 25 * 60; // 25 minutes in seconds
+        let isRunning = false;
+        let studyDuration = 25 * 60;
+        let breakDuration = 5 * 60;
+        let completedSessions = 0;
+        let totalStudyTime = 0;
+        let currentStreak = 0;
+        let weeklyGoal = 0;
+
+        // Initialize study mode
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStudyStats();
+            updateTimerDisplay();
+            updateStatsDisplay();
+        });
+
+        function startTimer() {
+            if (isRunning) return;
+
+            isRunning = true;
+            setTimerButtonState();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function pauseTimer() {
+            isRunning = false;
+            clearActiveTimer();
+            setTimerButtonState();
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timeLeft = isStudyMode ? studyDuration : breakDuration;
+            updateTimerDisplay();
+        }
+
+        function updateTimer() {
+            if (!isRunning) return;
+
+            timeLeft--;
+
+            if (timeLeft <= 0) {
+                if (isStudyMode) {
+                    // Study session completed
+                    completedSessions++;
+                    totalStudyTime += studyDuration / 60; // Convert to minutes
+                    saveStudyStats();
+
+                    // Switch to break mode
+                    isStudyMode = false;
+                    timeLeft = breakDuration;
+                    updateTimerMode();
+                    showBreakReminder();
+                } else {
+                    // Break completed
+                    isStudyMode = true;
+                    timeLeft = studyDuration;
+                    updateTimerMode();
+                    showToast('Break time over! Ready to study again?', 'info');
+                }
+            }
+
+            updateTimerDisplay();
+        }
+
+        function clearActiveTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function setTimerButtonState() {
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+
+            if (startBtn) startBtn.disabled = isRunning;
+            if (pauseBtn) pauseBtn.disabled = !isRunning;
+        }
+
+        function updateTimerMode() {
+            const mode = document.getElementById('timerMode');
+            if (mode) mode.textContent = isStudyMode ? 'Study Time' : 'Break Time';
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timerDisplay');
+
+            if (!display) {
+                console.warn("timerDisplay not found");
+                return;
+            }
+
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+
+            display.textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerSettings() {
+            const studySelect = document.getElementById('studyDuration');
+            const breakSelect = document.getElementById('breakDuration');
+
+            studyDuration = parseInt(studySelect?.value || '25', 10) * 60;
+            breakDuration = parseInt(breakSelect?.value || '5', 10) * 60;
+
+            if (!isRunning) {
+                timeLeft = isStudyMode ? studyDuration : breakDuration;
+                updateTimerDisplay();
+            }
+        }
+
+        function showBreakReminder() {
+            const reminder = document.getElementById('breakReminder');
+            if (!reminder) return;
+            reminder.style.display = 'block';
+
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                reminder.style.display = 'none';
+            }, 10000);
+        }
+
+        function dismissBreakReminder() {
+            const reminder = document.getElementById('breakReminder');
+            if (reminder) reminder.style.display = 'none';
+        }
+
+        function saveSessionNotes() {
+            const notes = document.getElementById('sessionNotes').value.trim();
+            if (!notes) {
+                showToast('Please enter some notes', 'error');
+                return;
+            }
+
+            const noteDiv = document.createElement('div');
+            noteDiv.className = 'note-item';
+            noteDiv.innerHTML = `
+                <div class="note-content">${notes}</div>
+                <div class="note-time">${new Date().toLocaleString()}</div>
+            `;
+
+            const recentNotes = document.getElementById('recentNotes');
+            recentNotes.insertBefore(noteDiv, recentNotes.firstChild);
+
+            document.getElementById('sessionNotes').value = '';
+            showToast('Notes saved!', 'success');
+
+            // Save to localStorage
+            const savedNotes = JSON.parse(localStorage.getItem('studyNotes') || '[]');
+            savedNotes.unshift({
+                content: notes,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('studyNotes', JSON.stringify(savedNotes.slice(0, 10))); // Keep last 10
+        }
+
+        function loadStudyStats() {
+            const stats = JSON.parse(localStorage.getItem('studyStats') || '{}');
+            completedSessions = stats.completedSessions || 0;
+            totalStudyTime = stats.totalStudyTime || 0;
+            currentStreak = stats.currentStreak || 0;
+            weeklyGoal = stats.weeklyGoal || 0;
+
+            updateStatsDisplay();
+
+            // Load recent notes
+            const savedNotes = JSON.parse(localStorage.getItem('studyNotes') || '[]');
+            const recentNotes = document.getElementById('recentNotes');
+            savedNotes.forEach(note => {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'note-item';
+                noteDiv.innerHTML = `
+                    <div class="note-content">${note.content}</div>
+                    <div class="note-time">${new Date(note.timestamp).toLocaleString()}</div>
+                `;
+                recentNotes.appendChild(noteDiv);
+            });
+        }
+
+        function saveStudyStats() {
+            const stats = {
+                completedSessions,
+                totalStudyTime,
+                currentStreak,
+                weeklyGoal,
+                lastUpdated: new Date().toISOString()
+            };
+            localStorage.setItem('studyStats', JSON.stringify(stats));
+            updateStatsDisplay();
+        }
+
+        function updateStatsDisplay() {
+            const totalStudyTimeEl = document.getElementById('totalStudyTime');
+            const completedSessionsEl = document.getElementById('completedSessions');
+            const currentStreakEl = document.getElementById('currentStreak');
+            const weeklyGoalEl = document.getElementById('weeklyGoal');
+
+            if (totalStudyTimeEl) totalStudyTimeEl.textContent = `${Math.round(totalStudyTime)}m`;
+            if (completedSessionsEl) completedSessionsEl.textContent = completedSessions;
+            if (currentStreakEl) currentStreakEl.textContent = currentStreak;
+            if (weeklyGoalEl) weeklyGoalEl.textContent = `${weeklyGoal}/7`;
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

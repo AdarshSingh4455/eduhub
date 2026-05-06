@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Meditation</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body { text-align: center; }
+    .meditation-page { padding: 40px; color: white; }
+    h1 { font-size: 2.5em; margin-bottom: 20px; }
+    .circle {
+      width: 200px;
+      height: 200px;
+      margin: 40px auto;
+      border-radius: 50%;
+      background-color: #add8e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 2px;
+      left: 10px;
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      font-size: 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s;
+    }
+
+    .videos {
+      margin-top: 30px;
+    }
+    .videos iframe {
+      width: 90%;
+      max-width: 500px;
+      margin: 20px auto;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="fas fa-book" style="font-size: 1.8em;"></i>
+      <h2>EduHub</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="index.html#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a href="index.html#studies"><i class="fas fa-book"></i> Studies</a></li>
+      <li><a href="index.html#skills"><i class="fas fa-laptop-code"></i> Skills</a></li>
+      <li><a href="index.html#mental-health" class="active"><i class="fas fa-heart"></i> Mental Health</a></li>
+      <li><a href="index.html#chat"><i class="fas fa-comments"></i> Chat Support</a></li>
+      <li><a href="index.html#about"><i class="fas fa-circle-info"></i> About</a></li>
+      <li><a href="index.html#profile"><i class="fas fa-user"></i> Profile</a></li>
+    </ul>
+  </div>
+
+  <button onclick="goBack()" class="back-button">⬅ Back</button>
+  <main class="meditation-page">
+    <h1>Meditation Timer</h1>
+    <div class="circle" id="meditateCircle">60s</div>
+    <p id="message">Close your eyes and focus on your breath...</p>
+
+    <div class="videos">
+      <h2>Guided Meditation Techniques</h2>
+      <iframe src="https://www.youtube.com/embed/inpok4MKVLM" frameborder="0" allowfullscreen></iframe>
+      <iframe src="https://www.youtube.com/embed/ZToicYcHIOU" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </main>
+  
+  <script>
+    let time = 60;
+    const circle = document.getElementById('meditateCircle');
+    const message = document.getElementById('message');
+
+    const timer = setInterval(() => {
+      time--;
+      circle.textContent = time + 's';
+      if (time === 0) {
+        clearInterval(timer);
+        message.textContent = "Well done! You've completed your meditation.";
+      }
+    }, 1000);
+
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+</html>

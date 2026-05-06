@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mindfulness - EduHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-book" style="font-size: 1.8em;"></i>
+            <h2>EduHub</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="index.html#studies"><i class="fas fa-book"></i> Studies</a></li>
+            <li><a href="index.html#skills"><i class="fas fa-laptop-code"></i> Skills</a></li>
+            <li><a href="index.html#mental-health" class="active"><i class="fas fa-heart"></i> Mental Health</a></li>
+            <li><a href="index.html#chat"><i class="fas fa-comments"></i> Chat Support</a></li>
+            <li><a href="index.html#about"><i class="fas fa-circle-info"></i> About</a></li>
+            <li><a href="index.html#profile"><i class="fas fa-user"></i> Profile</a></li>
+        </ul>
+    </div>
+
+    <header>
+        <button class="sidebar-toggle" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1>Mindfulness</h1>
+            <p>Simple practices to pause, reset, and return with clarity</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="section-content">
+                <h2><i class="fas fa-spa"></i> Mindfulness Practice</h2>
+                <p>Take a quiet minute to notice your breathing, relax your shoulders, and bring attention back to the present moment.</p>
+                <div class="cards-grid">
+                    <div class="card">
+                        <i class="fas fa-wind"></i>
+                        <h3>Breathe</h3>
+                        <p>Inhale slowly, hold briefly, and exhale with control.</p>
+                    </div>
+                    <div class="card">
+                        <i class="fas fa-eye"></i>
+                        <h3>Notice</h3>
+                        <p>Observe thoughts without judging them or rushing to react.</p>
+                    </div>
+                    <div class="card">
+                        <i class="fas fa-seedling"></i>
+                        <h3>Reset</h3>
+                        <p>Return to one small next action when you feel centered.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

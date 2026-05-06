@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduHub - Modern Learning Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="modal">
+        <div class="modal-content auth-modal">
+            <div class="modal-header">
+                <h2>Welcome to EduHub</h2>
+                <p>Your AI-powered learning companion</p>
+            </div>
+
+            <div class="auth-content">
+                <!-- Student Login Only -->
+                <div class="login-section active">
+                    <button class="btn google-btn" onclick="signInWithGoogle()">
+                        <i class="fab fa-google"></i> Continue with Google
+                    </button>
+                </div>
+
+                <div class="auth-info">
+                    <p>By signing in, you agree to our terms of service and privacy policy.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-book" style="font-size: 1.8em;"></i>
+            <h2>EduHub</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="nav-item" data-section="dashboard" onclick="navigate('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="#" class="nav-item" data-section="studies" onclick="navigate('studies')"><i class="fas fa-book"></i> Studies</a></li>
+            <li><a href="#" class="nav-item" data-section="skills" onclick="navigate('skills')"><i class="fas fa-laptop-code"></i> Skills</a></li>
+            <li><a href="#" class="nav-item" data-section="mental-health" onclick="navigate('mental-health')"><i class="fas fa-heart"></i> Mental Health</a></li>
+            <li><a href="#" class="nav-item" data-section="chat" onclick="navigate('chat')"><i class="fas fa-comments"></i> Chat Support</a></li>
+            <li><a href="#" class="nav-item" data-section="about" onclick="navigate('about')"><i class="fas fa-circle-info"></i> About</a></li>
+            <li><a href="#" onclick="openProfilePage()"><i class="fas fa-user"></i> Profile</a></li>
+            <li style="border-top: 1px solid rgba(255, 255, 255, 0.2); margin-top: 20px; padding-top: 20px;">
+                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </li>
+        </ul>
+
+        <!-- PROFILE SECTION -->
+        <div class="profile-section">
+            <div class="profile-picture">
+                <img id="profileImg" src="https://img.icons8.com/color/96/000000/user-male-circle--v1.png" alt="Profile" onerror="this.src='https://img.icons8.com/color/96/000000/user-male-circle--v1.png'">
+            </div>
+            <div class="profile-info">
+                <div class="profile-name" id="profileName">Guest</div>
+                <div class="profile-role" id="profileRole">STUDENT</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <button class="sidebar-toggle" style="opacity: 0.3; cursor: not-allowed;" disabled>
+            <i class="fas fa-book"></i>
+        </button>
+        <div class="header-content">
+            <h1>Welcome to EduHub</h1>
+            <p>Your Modern AI-Powered Learning Platform</p>
+        </div>
+        <div class="auth-buttons">
+            <button class="btn secondary theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">
+                <i class="fas fa-adjust"></i>
+            </button>
+            <span class="user-info" id="userInfo" style="display: none;"></span>
+            <button class="auth-btn logout" id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section">
+            <div class="section-content">
+                <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+                <p>Track your learning progress and achievements</p>
+                
+                <div class="cards-grid" style="margin: 30px 0;">
+                    <div class="card" onclick="showStudyProgress()">
+                        <i class="fas fa-book"></i>
+                        <h3>Study Progress</h3>
+                        <p>View your study materials and progress</p>
+                    </div>
+                    <div class="card" onclick="showSkillProgress()">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Skill Progress</h3>
+                        <p>Track your skill development</p>
+                    </div>
+                    <div class="card" onclick="showGoals()">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>Learning Goals</h3>
+                        <p>Set and manage your goals</p>
+                    </div>
+                    <div class="card" onclick="showReports()">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>Reports</h3>
+                        <p>View detailed progress reports</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Studies Section -->
+        <section id="studies" class="section">
+            <div class="section-content">
+                <h2><i class="fas fa-book-open"></i> Studies</h2>
+                <p>Access your study materials and resources</p>
+                <button class="btn" onclick="toggleContent('studyResources')">Explore Resources</button>
+                
+                <div id="adminStudiesTools" class="hidden" style="margin-top: 20px;">
+                    <button class="btn secondary" onclick="showAddSubject()">+ Add New Subject</button>
+                </div>
+
+                <div id="studyResources" class="hidden" style="margin-top: 20px;">
+                    <ul class="resource-list">
+                        <li class="resource-item">
+                            <a href="#" onclick="openSubjectDetail('web-dev')">Web Development</a>
+                            <div class="resource-actions" id="webDevActions" style="display: none;">
+                                <button class="action-btn" onclick="editSubject('web-dev')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn" onclick="deleteSubject('web-dev')" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                        <li class="resource-item">
+                            <a href="#" onclick="openSubjectDetail('python')">Python Programming</a>
+                            <div class="resource-actions" style="display: none;">
+                                <button class="action-btn" onclick="editSubject('python')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn" onclick="deleteSubject('python')" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                        <li class="resource-item">
+                            <a href="#" onclick="openSubjectDetail('data-science')">Data Science</a>
+                            <div class="resource-actions" style="display: none;">
+                                <button class="action-btn" onclick="editSubject('data-science')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn" onclick="deleteSubject('data-science')" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                        <li class="resource-item">
+                            <a href="#" onclick="openSubjectDetail('machine-learning')">Machine Learning</a>
+                            <div class="resource-actions" style="display: none;">
+                                <button class="action-btn" onclick="editSubject('machine-learning')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn" onclick="deleteSubject('machine-learning')" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="section">
+            <div class="section-content">
+                <h2><i class="fas fa-cogs"></i> Skill Development</h2>
+                <p>Enhance your skills with online courses</p>
+                <button class="btn" onclick="toggleContent('skillCourses')">Start Learning</button>
+                
+                <div id="adminSkillsTools" class="hidden" style="margin-top: 20px;">
+                    <button class="btn secondary" onclick="showAddSkill()">+ Add New Skill</button>
+                </div>
+
+                <div id="skillCourses" class="hidden" style="margin-top: 20px;">
+                    <ul class="resource-list">
+                        <li class="resource-item">
+                            <a href="#" onclick="openSkillDetail('web-dev')">Web Development</a>
+                            <div class="resource-actions" style="display: none;">
+                                <button class="action-btn" onclick="editSkill('web-dev')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn" onclick="deleteSkill('web-dev')" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                        <li class="resource-item">
+                            <a href="#" onclick="openSkillDetail('javascript')">JavaScript</a>
+                            <div class="resource-actions" style="display: none;">
+                                <button class="action-btn" onclick="editSkill('javascript')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn" onclick="deleteSkill('javascript')" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                        <li class="resource-item">
+                            <a href="#" onclick="openSkillDetail('graphic-design')">Graphic Design</a>
+                            <div class="resource-actions" style="display: none;">
+                                <button class="action-btn" onclick="editSkill('graphic-design')" title="Edit"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn" onclick="deleteSkill('graphic-design')" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mental Health Chatbot Section -->
+        <section id="mental-health" class="section">
+            <div class="section-content">
+                <h2><i class="fas fa-heart"></i> Mental Health Support</h2>
+                <p>Chat with our AI mental health companion for support and guidance</p>
+
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-avatar">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="chat-info">
+                            <h3>MindCare AI</h3>
+                            <span class="chat-status">Online</span>
+                        </div>
+                        <button class="chat-maximize" onclick="toggleChatMaximize()">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+
+                    <div class="chat-messages" id="mentalHealthMessages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm MindCare AI, your mental health companion. I'm here to listen, support, and provide guidance. How are you feeling today?</p>
+                                <span class="message-time">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <input type="text" id="mentalHealthInput" placeholder="Share what's on your mind..." onkeypress="handleMentalHealthKeyPress(event)">
+                        <button class="chat-send-btn" onclick="sendMentalHealthMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mental-health-resources">
+                    <h3>Quick Resources & Activities</h3>
+                    <div class="resource-grid">
+                        <!-- Meditation Activity -->
+                        <div class="resource-card" style="cursor: pointer; text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px;" onclick="startMeditationTimer(300)">
+                            <i class="fas fa-om" style="font-size: 2em; margin-bottom: 10px;"></i>
+                            <span>Start Meditation (5 min)</span>
+                        </div>
+
+                        <!-- Stress Relief Activity -->
+                        <div class="resource-card" style="cursor: pointer; text-align: center; padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 10px;" onclick="startStressReliefTimer(300)">
+                            <i class="fas fa-wind" style="font-size: 2em; margin-bottom: 10px;"></i>
+                            <span>Breathing Exercise (5 min)</span>
+                        </div>
+
+                        <!-- Coping with Anxiety -->
+                        <a href="coping-with-anxiety.html" class="resource-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 10px;">
+                            <i class="fas fa-brain"></i>
+                            <span>Coping with Anxiety</span>
+                        </a>
+
+                        <!-- Work-Life Balance -->
+                        <a href="work-life-balance.html" class="resource-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); border-radius: 10px;">
+                            <i class="fas fa-balance-scale"></i>
+                            <span>Work-Life Balance</span>
+                        </a>
+                    </div>
+
+                    <!-- Meditation Timer Display -->
+                    <div id="meditationTimerSection" style="display: none; text-align: center; margin-top: 30px; padding: 30px; background: rgba(102, 126, 234, 0.1); border-radius: 15px;">
+                        <h3>Meditation in Progress</h3>
+                        <div id="meditateCircle" style="width: 200px; height: 200px; margin: 30px auto; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 3em; color: white; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
+                            60s
+                        </div>
+                        <p id="message" style="font-size: 1.1em; margin: 20px 0; opacity: 0.9;">Close your eyes and focus on your breath...</p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button class="btn" onclick="pauseTimer()">Pause</button>
+                            <button class="btn secondary" onclick="resetTimer()">Stop</button>
+                        </div>
+                    </div>
+
+                    <!-- Stress Relief Timer Display -->
+                    <div id="stressReliefTimerSection" style="display: none; text-align: center; margin-top: 30px; padding: 30px; background: rgba(245, 87, 108, 0.1); border-radius: 15px;">
+                        <h3>Stress Relief - Breathing Exercise</h3>
+                        <div id="stressCircle" style="width: 200px; height: 200px; margin: 30px auto; border-radius: 50%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; font-size: 2.5em; color: white; box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);">
+                            05:00
+                        </div>
+                        <p id="stressMessage" style="font-size: 1.1em; margin: 20px 0; opacity: 0.9;">Get ready to breathe...</p>
+                        <div id="breathInstruction" style="font-size: 1.3em; font-weight: bold; margin: 15px 0; color: #667eea;">Get ready to breathe...</div>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button class="btn" onclick="pauseTimer()">Pause</button>
+                            <button class="btn secondary" onclick="resetTimer()">Stop</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Support Section -->
+        <section id="chat" class="section">
+            <h2><i class="fas fa-comments"></i> Chat Support</h2>
+            <p>Need help? Chat with Saarthi, your AI study companion</p><br>
+            <button class="btn" onclick="openChatWindow()">Start Chat with Saarthi</button>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section hidden">
+            <div class="section-content about-section">
+                <div class="about-hero">
+                    <span class="about-kicker">AI learning ecosystem</span>
+                    <h2><i class="fas fa-circle-info"></i> About EduHub</h2>
+                    <p class="about-intro">
+                        EduHub is an AI-powered learning platform designed to help students grow academically and personally. It combines smart study tools, skill tracking, and mental wellness support into one unified experience.
+                    </p>
+                </div>
+
+                <div class="about-cards">
+                    <div class="about-card">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>1200+ Students Enrolled</h3>
+                        <p>A growing learner community using EduHub to stay focused and consistent.</p>
+                    </div>
+                    <div class="about-card">
+                        <i class="fas fa-book-open"></i>
+                        <h3>25+ Courses Available</h3>
+                        <p>Structured study resources across academics, programming, and core skills.</p>
+                    </div>
+                    <div class="about-card">
+                        <i class="fas fa-robot"></i>
+                        <h3>AI-Powered Chatbots</h3>
+                        <p>Saarthi supports learning while MindCare provides wellness-first guidance.</p>
+                    </div>
+                    <div class="about-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>Smart Progress Tracking</h3>
+                        <p>Clear dashboards help students understand goals, reports, and progress.</p>
+                    </div>
+                    <div class="about-card">
+                        <i class="fas fa-brain"></i>
+                        <h3>Mental Health Support</h3>
+                        <p>Wellness tools, breathing exercises, and supportive AI conversations in one place.</p>
+                    </div>
+                    <div class="about-card">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>Resource Management</h3>
+                        <p>Books, videos, filters, and admin controls keep learning material organized.</p>
+                    </div>
+                </div>
+
+                <div class="about-split">
+                    <div class="about-why">
+                        <h3>Why EduHub is Different?</h3>
+                        <ul>
+                            <li>Combines learning + mental health in one platform</li>
+                            <li>AI-based personalized support</li>
+                            <li>Clean and distraction-free UI</li>
+                            <li>Designed for students, by students</li>
+                            <li>All-in-one dashboard experience</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-trust">
+                        <h3>Trust & Impact</h3>
+                        <p>
+                            EduHub is trusted by hundreds of students who use it daily to manage studies, improve skills, and stay mentally balanced. Our goal is to create a supportive ecosystem where learning becomes simple, structured, and stress-free.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="section hidden">
+            <div class="section-content">
+                <h2><i class="fas fa-user"></i> Profile Settings</h2>
+                <p>Manage your account information and preferences</p>
+
+                <div class="profile-form" style="max-width: 600px; margin: 30px auto;">
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" id="profileNameInput" placeholder="Your full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Password:</label>
+                        <input type="password" id="profilePasswordInput" placeholder="New password (leave empty to keep current)">
+                    </div>
+                    <div class="form-group">
+                        <label>Profile Picture:</label>
+                        <input type="file" id="profilePictureInput" accept="image/*" onchange="previewProfilePicture()">
+                        <div style="margin-top: 10px;">
+                            <img id="profilePreview" src="https://img.icons8.com/color/96/000000/user-male-circle--v1.png" alt="Preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="updateProfile()">Update Profile</button>
+                    <button class="btn danger" onclick="deleteAccount()" style="margin-top: 20px;">Delete Account</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- SUBJECT/SKILL DETAIL MODAL -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="closeDetailModal()">&times;</span>
+            
+            <h2 id="detailTitle">Subject Details</h2>
+
+            <div class="filter-bar">
+                <select id="classFilter">
+                    <option value="">Class</option>
+                    <option value="nursery">Nursery</option>
+                    <option value="lkg">LKG</option>
+                    <option value="ukg">UKG</option>
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                    <option value="3rd">3rd</option>
+                    <option value="4th">4th</option>
+                    <option value="5th">5th</option>
+                    <option value="6th">6th</option>
+                    <option value="7th">7th</option>
+                    <option value="8th">8th</option>
+                    <option value="9th">9th</option>
+                    <option value="10th">10th</option>
+                    <option value="11th">11th</option>
+                    <option value="12th">12th</option>
+                </select>
+
+                <select id="courseFilter">
+                    <option value="">Course</option>
+                    <option value="btech">BTech</option>
+                    <option value="bca">BCA</option>
+                    <option value="mca">MCA</option>
+                    <option value="mtech">MTech</option>
+                    <option value="bba">BBA</option>
+                    <option value="mba">MBA</option>
+                </select>
+
+                <button class="btn secondary small" onclick="applyFilters()">Apply</button>
+                <button class="btn secondary small" onclick="clearStudentFilters()">Clear</button>
+            </div>
+            
+            <div class="modal-tabs">
+                <button class="tab-btn active" data-detail-tab="books" onclick="switchDetailTab('books', this)">
+                    <i class="fas fa-book"></i> Books
+                </button>
+                <button class="tab-btn" data-detail-tab="videos" onclick="switchDetailTab('videos', this)">
+                    <i class="fas fa-video"></i> Videos
+                </button>
+            </div>
+
+            <!-- BOOKS TAB -->
+            <div id="booksTab" class="tab-content">
+                <div id="adminBookTools" class="hidden" style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                    <button class="btn secondary" onclick="showUploadBook()">+ Upload PDF</button>
+                    <div class="resource-filter">
+                        <label>Search books</label>
+                        <input type="text" id="bookSearch" placeholder="Search by title or topic" oninput="onBookSearch()" />
+                    </div>
+                </div>
+
+                <div id="uploadBookForm" class="hidden" style="margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>Book Title:</label>
+                        <input type="text" id="bookTitle" placeholder="Enter book title">
+                    </div>
+                    <div class="form-group">
+                        <label>Class/Grade (optional):</label>
+                        <select id="bookClass">
+                            <option value="">-- Select Class --</option>
+                            <option value="nursery">Nursery</option>
+                            <option value="lkg">LKG</option>
+                            <option value="ukg">UKG</option>
+                            <option value="1st">1st</option>
+                            <option value="2nd">2nd</option>
+                            <option value="3rd">3rd</option>
+                            <option value="4th">4th</option>
+                            <option value="5th">5th</option>
+                            <option value="6th">6th</option>
+                            <option value="7th">7th</option>
+                            <option value="8th">8th</option>
+                            <option value="9th">9th</option>
+                            <option value="10th">10th</option>
+                            <option value="11th">11th</option>
+                            <option value="12th">12th</option>
+                            <option value="everyone">Everyone</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Course (optional):</label>
+                        <select id="bookCourse">
+                            <option value="">-- Select Course --</option>
+                            <option value="btech">BTech</option>
+                            <option value="bca">BCA</option>
+                            <option value="mca">MCA</option>
+                            <option value="mtech">MTech</option>
+                            <option value="bba">BBA</option>
+                            <option value="mba">MBA</option>
+                            <option value="everyone">Everyone</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload PDF:</label>
+                        <div id="bookDropZone" class="drag-drop-zone">
+                            Drag & drop PDF here or click to choose file
+                        </div>
+                        <input type="file" id="bookFile" accept=".pdf" class="hidden-file-input">
+                        <div id="bookFileName" class="file-name">No file selected</div>
+                    </div>
+                    <button class="btn" onclick="uploadBook(this)">Upload</button>
+                </div>
+
+                <div id="booksList" style="max-height: 300px; overflow-y: auto;">
+                    <p style="opacity: 0.7;">No books uploaded yet</p>
+                </div>
+            </div>
+
+            <!-- VIDEOS TAB -->
+            <div id="videosTab" class="tab-content hidden">
+                <div id="adminVideoTools" class="hidden" style="margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                    <button class="btn secondary" onclick="showAddVideo()">+ Add YouTube Video</button>
+                </div>
+
+                <div id="addVideoForm" class="hidden" style="margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>Video Title:</label>
+                        <input type="text" id="videoTitle" placeholder="Enter video title">
+                    </div>
+                    <div class="form-group">
+                        <label>Class/Grade (optional):</label>
+                        <select id="videoClass">
+                            <option value="">-- Select Class --</option>
+                            <option value="nursery">Nursery</option>
+                            <option value="lkg">LKG</option>
+                            <option value="ukg">UKG</option>
+                            <option value="1st">1st</option>
+                            <option value="2nd">2nd</option>
+                            <option value="3rd">3rd</option>
+                            <option value="4th">4th</option>
+                            <option value="5th">5th</option>
+                            <option value="6th">6th</option>
+                            <option value="7th">7th</option>
+                            <option value="8th">8th</option>
+                            <option value="9th">9th</option>
+                            <option value="10th">10th</option>
+                            <option value="11th">11th</option>
+                            <option value="12th">12th</option>
+                            <option value="everyone">Everyone</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Course (optional):</label>
+                        <select id="videoCourse">
+                            <option value="">-- Select Course --</option>
+                            <option value="btech">BTech</option>
+                            <option value="bca">BCA</option>
+                            <option value="mca">MCA</option>
+                            <option value="mtech">MTech</option>
+                            <option value="bba">BBA</option>
+                            <option value="mba">MBA</option>
+                            <option value="everyone">Everyone</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>YouTube URL:</label>
+                        <input type="url" id="videoUrl" placeholder="https://youtube.com/watch?v=...">
+                    </div>
+                    <button class="btn" onclick="addVideo()">Add Video</button>
+                </div>
+
+                <div id="videosList" style="max-height: 300px; overflow-y: auto;">
+                    <p style="opacity: 0.7;">No videos added yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT WINDOW -->
+    <button class="chat-button" onclick="openChatWindow()" title="Chat with Saarthi">
+        <i class="fas fa-comments"></i>
+    </button>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chatbot-toggle">
+                <button class="chatbot-btn active" id="saarthiBtn" onclick="switchChatbot('saarthi')">
+                    <i class="fas fa-graduation-cap"></i> Saarthi
+                </button>
+                <button class="chatbot-btn" id="mindcareBtn" onclick="switchChatbot('mindcare')">
+                    <i class="fas fa-heart"></i> MindCare AI
+                </button>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="chat-action-btn" onclick="maximizeChatWindow()" title="Maximize">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button class="close" onclick="closeChatWindow()">&times;</button>
+            </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will be added dynamically -->
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Ask me anything..." />
+            <button class="send-btn" onclick="sendChatMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- GOALS MODAL -->
+    <div id="goalsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGoalsModal()">&times;</span>
+            <h2><i class="fas fa-bullseye"></i> Learning Goals</h2>
+
+            <div id="goalsList">
+                <p style="opacity: 0.7;">No goals set yet</p>
+            </div>
+
+            <div class="goal-form" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                <h3 style="color: white; margin-bottom: 15px;">Add New Goal</h3>
+                <div class="form-group">
+                    <label>Goal Title:</label>
+                    <input type="text" id="goalTitle" placeholder="e.g., Complete Web Development Course">
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="goalDescription" placeholder="Describe your goal..." rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Priority:</label>
+                    <select id="goalPriority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="addGoal()">Add Goal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REPORTS MODAL -->
+    <div id="reportsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReportsModal()">&times;</span>
+            <h2><i class="fas fa-file-alt"></i> Progress Reports</h2>
+
+            <div class="chart-container">
+                <h3 style="color: white; margin-bottom: 15px;">Most Accessed Subjects</h3>
+                <canvas id="subjectsChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3 style="color: white; margin-bottom: 15px;">Most Downloaded Topics</h3>
+                <canvas id="downloadsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROGRESS MODAL -->
+    <div id="progressModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeProgressModal()">&times;</span>
+            <h2 id="progressTitle"><i class="fas fa-chart-line"></i> Progress</h2>
+
+            <div id="progressList">
+                <!-- Progress bars will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD SUBJECT MODAL -->
+    <div id="addSubjectModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeSubjectModal()">&times;</span>
+            <h2>Add New Subject</h2>
+            <div class="form-group">
+                <label>Subject Name:</label>
+                <input type="text" id="subjectNameInput" placeholder="e.g., Web Development">
+            </div>
+            <button class="btn" onclick="saveNewSubject()">Add Subject</button>
+        </div>
+    </div>
+
+    <!-- ADD SKILL MODAL -->
+    <div id="addSkillModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="closeSkillModal()">&times;</span>
+            <h2>Add New Skill</h2>
+            <div class="form-group">
+                <label>Skill Name:</label>
+                <input type="text" id="skillNameInput" placeholder="e.g., JavaScript">
+            </div>
+            <button class="btn" onclick="saveNewSkill()">Add Skill</button>
+        </div>
+    </div>
+
+    <!-- EDIT BOOK MODAL -->
+    <div id="editBookModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="document.getElementById('editBookModal').style.display='none'">&times;</span>
+            <h2>Edit Book</h2>
+            <input type="hidden" id="editBookId">
+            <div class="form-group">
+                <label>Title:</label>
+                <input type="text" id="editBookTitle" placeholder="Book title">
+            </div>
+            <div class="form-group">
+                <label>Class:</label>
+                <select id="editBookClass">
+                    <option value="everyone">Everyone</option>
+                    <option value="nursery">Nursery</option>
+                    <option value="lkg">LKG</option>
+                    <option value="ukg">UKG</option>
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                    <option value="3rd">3rd</option>
+                    <option value="4th">4th</option>
+                    <option value="5th">5th</option>
+                    <option value="6th">6th</option>
+                    <option value="7th">7th</option>
+                    <option value="8th">8th</option>
+                    <option value="9th">9th</option>
+                    <option value="10th">10th</option>
+                    <option value="11th">11th</option>
+                    <option value="12th">12th</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Course:</label>
+                <select id="editBookCourse">
+                    <option value="everyone">Everyone</option>
+                    <option value="btech">B.Tech</option>
+                    <option value="bca">BCA</option>
+                    <option value="mca">MCA</option>
+                    <option value="mtech">M.Tech</option>
+                    <option value="bba">BBA</option>
+                    <option value="mba">MBA</option>
+                </select>
+            </div>
+            <button class="btn" onclick="saveBookEdit()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- EDIT VIDEO MODAL -->
+    <div id="editVideoModal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="document.getElementById('editVideoModal').style.display='none'">&times;</span>
+            <h2>Edit Video</h2>
+            <input type="hidden" id="editVideoId">
+            <div class="form-group">
+                <label>Title:</label>
+                <input type="text" id="editVideoTitle" placeholder="Video title">
+            </div>
+            <div class="form-group">
+                <label>YouTube URL:</label>
+                <input type="url" id="editVideoUrl" placeholder="https://youtube.com/watch?v=...">
+            </div>
+            <div class="form-group">
+                <label>Class:</label>
+                <select id="editVideoClass">
+                    <option value="everyone">Everyone</option>
+                    <option value="nursery">Nursery</option>
+                    <option value="lkg">LKG</option>
+                    <option value="ukg">UKG</option>
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                    <option value="3rd">3rd</option>
+                    <option value="4th">4th</option>
+                    <option value="5th">5th</option>
+                    <option value="6th">6th</option>
+                    <option value="7th">7th</option>
+                    <option value="8th">8th</option>
+                    <option value="9th">9th</option>
+                    <option value="10th">10th</option>
+                    <option value="11th">11th</option>
+                    <option value="12th">12th</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Course:</label>
+                <select id="editVideoCourse">
+                    <option value="everyone">Everyone</option>
+                    <option value="btech">B.Tech</option>
+                    <option value="bca">BCA</option>
+                    <option value="mca">MCA</option>
+                    <option value="mtech">M.Tech</option>
+                    <option value="bba">BBA</option>
+                    <option value="mba">MBA</option>
+                </select>
+            </div>
+            <button class="btn" onclick="saveVideoEdit()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2025 EduHub - Your Modern Learning Platform. All rights reserved.</p>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/marked@latest/marked.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="data-manager.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

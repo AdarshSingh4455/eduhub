@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coping with Anxiety - EduHub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="data-manager.js"></script>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-book" style="font-size: 1.8em;"></i>
+            <h2>EduHub</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+            <li><a href="index.html#studies"><i class="fas fa-book"></i> Studies</a></li>
+            <li><a href="index.html#skills"><i class="fas fa-laptop-code"></i> Skills</a></li>
+            <li><a href="index.html#mental-health" class="active"><i class="fas fa-heart"></i> Mental Health</a></li>
+            <li><a href="index.html#chat"><i class="fas fa-comments"></i> Chat Support</a></li>
+            <li><a href="index.html#about"><i class="fas fa-circle-info"></i> About</a></li>
+            <li><a href="index.html#profile"><i class="fas fa-user"></i> Profile</a></li>
+        </ul>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <button class="sidebar-toggle" onclick="goBack()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1>Coping with Anxiety</h1>
+            <p>Chat with our AI companion for anxiety support</p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <section class="anxiety-chat-section">
+            <div class="section-content">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-avatar">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="chat-info">
+                            <h3>Anxiety Support AI</h3>
+                            <span class="chat-status">Online</span>
+                        </div>
+                        <button class="chat-maximize" onclick="toggleChatMaximize()">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+
+                    <div class="chat-messages" id="anxietyMessages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="message-content">
+                                <p>Hello! I'm here to help you cope with anxiety. You can share your thoughts, feelings, or concerns with me. I can provide coping strategies, breathing exercises, and general support. What's on your mind today?</p>
+                                <span class="message-time">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <input type="text" id="anxietyInput" placeholder="Share your thoughts or ask for coping strategies..." onkeypress="handleAnxietyKeyPress(event)">
+                        <button class="chat-send-btn" onclick="sendAnxietyMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="quick-coping-strategies">
+                    <h3>Quick Coping Strategies</h3>
+                    <div class="strategy-grid">
+                        <button class="strategy-btn" onclick="sendQuickMessage('I need a breathing exercise')">
+                            <i class="fas fa-wind"></i>
+                            <span>Breathing Exercise</span>
+                        </button>
+                        <button class="strategy-btn" onclick="sendQuickMessage('Help me with anxious thoughts')">
+                            <i class="fas fa-brain"></i>
+                            <span>Thought Challenge</span>
+                        </button>
+                        <button class="strategy-btn" onclick="sendQuickMessage('Grounding techniques please')">
+                            <i class="fas fa-hand-paper"></i>
+                            <span>Grounding</span>
+                        </button>
+                        <button class="strategy-btn" onclick="sendQuickMessage('I feel overwhelmed')">
+                            <i class="fas fa-heart"></i>
+                            <span>Overwhelm Support</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="app.js"></script>
+    <script>
+        // Anxiety chat functions
+        async function sendAnxietyMessage() {
+            const input = document.getElementById('anxietyInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addAnxietyMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            showAnxietyTyping();
+
+            try {
+                // Call backend for anxiety support
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        context: 'anxiety_support'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    hideAnxietyTyping();
+                    addAnxietyMessage(data.response, 'bot');
+                } else {
+                    throw new Error('Failed to get response');
+                }
+            } catch (error) {
+                console.error('Anxiety chat error:', error);
+                hideAnxietyTyping();
+                addAnxietyMessage("I'm here to support you through anxious moments. Try this simple breathing exercise: Breathe in for 4 counts, hold for 4, exhale for 4. Would you like me to guide you through it?", 'bot');
+            }
+        }
+
+        function handleAnxietyKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendAnxietyMessage();
+            }
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('anxietyInput').value = message;
+            sendAnxietyMessage();
+        }
+
+        function addAnxietyMessage(message, sender) {
+            const messagesContainer = document.getElementById('anxietyMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+
+            const avatar = sender === 'bot' ?
+                '<i class="fas fa-brain"></i>' :
+                '<i class="fas fa-user"></i>';
+
+            messageDiv.innerHTML = `
+                <div class="message-avatar">
+                    ${avatar}
+                </div>
+                <div class="message-content">
+                    <p>${message}</p>
+                    <span class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showAnxietyTyping() {
+            const messagesContainer = document.getElementById('anxietyMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot-message typing-message';
+            typingDiv.id = 'anxietyTyping';
+
+            typingDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideAnxietyTyping() {
+            const typingDiv = document.getElementById('anxietyTyping');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+
+        function toggleChatMaximize() {
+            const chatContainer = document.querySelector('.chat-container');
+            const maximizeBtn = document.querySelector('.chat-maximize i');
+
+            chatContainer.classList.toggle('maximized');
+
+            if (chatContainer.classList.contains('maximized')) {
+                maximizeBtn.className = 'fas fa-compress';
+            } else {
+                maximizeBtn.className = 'fas fa-expand';
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

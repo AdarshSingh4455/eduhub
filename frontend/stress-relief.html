@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stress Relief</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      text-align: center;
+      color: aliceblue;
+    }
+
+    .stress-page {
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 2px;
+      left: 10px;
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      font-size: 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s;
+    }
+
+    .circle {
+      width: 200px;
+      height: 200px;
+      margin: 40px auto;
+      border-radius: 50%;
+      background-color: #2e3ae1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      animation: pulse 4s ease-in-out infinite;
+    }
+
+    .instructions {
+      font-size: 1.5em;
+      margin-top: 30px;
+    }
+
+    #restartBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #f39c12;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: none;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="fas fa-book" style="font-size: 1.8em;"></i>
+      <h2>EduHub</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="index.html#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+      <li><a href="index.html#studies"><i class="fas fa-book"></i> Studies</a></li>
+      <li><a href="index.html#skills"><i class="fas fa-laptop-code"></i> Skills</a></li>
+      <li><a href="index.html#mental-health" class="active"><i class="fas fa-heart"></i> Mental Health</a></li>
+      <li><a href="index.html#chat"><i class="fas fa-comments"></i> Chat Support</a></li>
+      <li><a href="index.html#about"><i class="fas fa-circle-info"></i> About</a></li>
+      <li><a href="index.html#profile"><i class="fas fa-user"></i> Profile</a></li>
+    </ul>
+  </div>
+
+  <button onclick="goBack()" class="back-button">⬅ Back</button>
+  <main class="stress-page">
+    <h1>Stress Relief Breathing</h1>
+    <div class="circle" id="meditateCircle">60s</div>
+    <p id="message">Close your eyes and focus on your breath...</p>
+    <div class="instructions" id="breathInstruction">Get ready to breathe...</div>
+    <button id="restartBtn" onclick="location.reload()">Start</button>
+  </main>
+
+  <!-- Audio elements -->
+  <audio id="audio-inhale" src="inhale (1).mp3"></audio>
+  <audio id="audio-hold" src="hold.mp3"></audio>
+  <audio id="audio-exhale" src="exhale.mp3"></audio>
+
+  <script>
+    const instructions = [
+      { text: "Take a deep breath in...", audioId: "audio-inhale" },
+      { text: "Hold your breath...", audioId: "audio-hold" },
+      { text: "Exhale slowly...", audioId: "audio-exhale" }
+    ];
+
+    let time = 60;
+    const circle = document.getElementById('meditateCircle');
+    const message = document.getElementById('message');
+    const textEl = document.getElementById('breathInstruction');
+    const restartBtn = document.getElementById('restartBtn');
+    let breathInterval;
+    restartBtn.textContent = "Start";
+
+
+    let index = 0;
+
+    function cycleBreath() {
+      const current = instructions[index];
+      textEl.textContent = current.text;
+      const audio = document.getElementById(current.audioId);
+      if (audio) {
+        audio.play().catch(() => {});
+      }
+      index = (index + 1) % instructions.length;
+    }
+
+    cycleBreath();
+    breathInterval = setInterval(cycleBreath, 4000);
+
+    const timer = setInterval(() => {
+      time--;
+      circle.textContent = time + 's';
+      if (time === 0) {
+        clearInterval(timer);
+        clearInterval(breathInterval);
+        message.textContent = "Session complete. To do again, press Start.";
+        textEl.textContent = "";
+        restartBtn.style.display = 'inline-block';
+      }
+    }, 1000);
+
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+</body>
+</html>
